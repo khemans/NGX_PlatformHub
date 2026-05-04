@@ -4,7 +4,7 @@
 **Source:** NGX Code Challenge (Senior Platform Engineer)  
 **Document purpose:** Single source of truth for scope, requirements, and success criteria aligned to the challenge brief.
 
-**Implementation snapshot (2026-05-03):** Terraform modules and split-state stacks (VPC, security groups, Secrets Manager, Aurora PostgreSQL Serverless v2, ECS Fargate + ALB) are in-repo with dual **fmt/validate-only** CI (GitHub Actions + GitLab). Root README, diagrams, automation **application** code, Terraform tests, supplemental “digging deeper” work, and AI workflow artifacts are **not** present yet. See **§10** for a full delta.
+**Implementation snapshot (2026-05-03):** Terraform modules and split-state stacks (VPC, security groups, Secrets Manager, Aurora PostgreSQL Serverless v2, ECS Fargate + ALB) are in-repo with dual **fmt/validate-only** CI (GitHub Actions + GitLab). Repository **`README.md`**, **`DECISIONS.md`**, and **`diagrams/`** (Mermaid architecture) are present. Automation **application** code, Terraform tests, supplemental “digging deeper” work, and AI workflow artifacts are **not** present yet. See **§10** for a full delta.
 
 ---
 
@@ -136,7 +136,7 @@ Use this checklist against the **original** challenge; bracketed notes reflect *
 - [ ] **Core — AI (FR-AI):** AI agent config in repo + open PR demonstrating AI-assisted work. *[ ] Not started (`CLAUDE.md` / equivalent absent).*
 - [ ] **Core — Terraform & CI (FR-TF):** Reusable modules; automated checks/tests; deploy path; no wildcard IAM; no hardcoded secrets. *Partial: modules + split S3 state stacks + least-privilege patterns + Secrets Manager; `[x]` fmt/validate CI only; `[ ]` Terraform tests; `[ ]` automated apply in CI.*
 - [ ] **Core — Automation service (FR-SVC):** ECS Fargate or Lambda with validation, error handling, Dockerfile, LB/API GW/CloudFront, observability (logs/alarms/SNS), persistence (S3 | DynamoDB | Aurora). *Partial: `[x]` ECS Fargate + ALB + Aurora in Terraform; `[ ]` custom app code, Dockerfile, input validation, alarms/SNS, S3/Dynamo app persistence beyond Aurora as the data plane for future app.*
-- [ ] **Core — Docs (FR-DOC):** README (deploy + what you built), design rationale, `diagrams/`. *Partial: `[x]` `terraform/stacks/README.md` + env/stack `*.tfvars.example`; `[ ]` repository root README, `DECISIONS.md`, `diagrams/`.*
+- [ ] **Core — Docs (FR-DOC):** README (deploy + what you built), design rationale, `diagrams/`. *Partial: `[x]` root **`README.md`**, **`DECISIONS.md`**, **`diagrams/architecture.md`** (Mermaid), **`terraform/stacks/README.md`**, env/stack `*.tfvars.example`; optional polish: richer README “what we built” once the app exists, exported diagram image.*
 - [ ] **Supplemental:** At least one “digging deeper” option (§7) with depth. *[ ] Not selected / not implemented.*
 - [ ] **Repository hygiene:** Shareable read-only remote; commits support narrative. *Pending user push/PR policy.*
 
@@ -151,7 +151,7 @@ Use this checklist against the **original** challenge; bracketed notes reflect *
 | **G3** Automation service (product) | **Partial** | Terraform provisions ECS + ALB + placeholder **nginx** image; no bespoke platform service, Dockerfile, or app-layer validation yet. |
 | **G4** Persistence (S3 / Dynamo / Aurora) | **Partial** | **Aurora PostgreSQL** + managed master secret; no app writing to S3/Dynamo yet. |
 | **G5** AI workflow evidence | **Not started** | No `CLAUDE.md` / MCP config; no sample PR documented in-repo. |
-| **G6** Docs & diagrams | **Partial** | Stack/env tfvars examples + stack README; no root README, `DECISIONS.md`, or `diagrams/`. |
+| **G6** Docs & diagrams | **Partial** | Root **`README.md`**, **`DECISIONS.md`**, **`diagrams/`** + stack/env examples; expand when automation service and supplemental work land. |
 | **FR-TF-2** Modules | **Done** | `terraform/modules/{vpc,security_groups,secrets,aurora,ecs_fargate}`. |
 | **FR-TF-1 / FR-TF-4** Deploy via pipeline | **Gap** | Intentional: all stack inputs live in **tfvars** + `backend.hcl`; pipelines stay static. Reconcile with reviewers by adding a thin apply job that only invokes Terraform with committed or mounted var-files, or document TFC/GitOps. |
 | **FR-TF-3** Tests | **Gap** | Add `terraform/tests` or module-level `tests` + optional `check` blocks / policy in CI. |
