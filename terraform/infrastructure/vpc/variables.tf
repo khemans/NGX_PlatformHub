@@ -1,6 +1,6 @@
 variable "aws_region" {
   type        = string
-  description = "AWS region for this stack (set in env *.core.tfvars)."
+  description = "AWS region for this root (set in env *.core.tfvars)."
   validation {
     condition     = length(trimspace(var.aws_region)) > 0
     error_message = "aws_region must be non-empty."

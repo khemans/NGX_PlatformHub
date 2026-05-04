@@ -1,4 +1,5 @@
 # S3 remote state location (stacks that read other stacks' outputs). Copy to dev.remote_state.tfvars.
+# terraform_state_bucket: use the bucket name from `terraform apply` in `terraform/infrastructure/s3_state/` (output state_bucket_id).
 # Use together with dev.core.tfvars, e.g.:
 #   terraform plan -var-file=../../env/dev.core.tfvars -var-file=../../env/dev.remote_state.tfvars -var-file=dev.tfvars
 #

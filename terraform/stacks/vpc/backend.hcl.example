@@ -1,8 +1,0 @@
-# Copy to backend.hcl (gitignored) and run: terraform init -backend-config=backend.hcl
-# Use the same bucket for all stacks; only `key` differs per stack folder.
-
-bucket       = "YOUR_ORG_TERRAFORM_STATE_BUCKET"
-key          = "ngx-platform-hub/dev/vpc/terraform.tfstate"
-region       = "us-east-1"
-encrypt      = true
-# dynamodb_table = "terraform-state-locks"

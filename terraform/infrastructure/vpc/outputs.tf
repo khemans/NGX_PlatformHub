@@ -1,5 +1,5 @@
 output "vpc_id" {
-  description = "VPC ID (consumed by other stacks via terraform_remote_state)."
+  description = "VPC ID (consumed by stacks via terraform_remote_state)."
   value       = module.vpc.vpc_id
 }
 

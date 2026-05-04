@@ -27,3 +27,13 @@ This document records **why** a few major choices were made, not every Terraform
 - **Terratest / kitchen in CI:** Valuable; not yet wired.
 
 **Trade-off:** The challenge’s “visible deploy path” is satisfied today by **documented** local or org-specific automation plus the same workflow files on **GitHub and GitLab**; a thin apply job that only invokes Terraform with **checked-in or mounted var-files** (still no literals in YAML) can be added later without changing the variable model.
+
+---
+
+## 3. `terraform/infrastructure/` vs `terraform/stacks/`
+
+**Decision:** Move **VPC** out of `terraform/stacks/` into **`terraform/infrastructure/vpc/`** alongside **`terraform/infrastructure/s3_state/`** (dedicated **S3 bucket** for Terraform state via module `s3_tfstate_bucket`) and **`terraform/infrastructure/dynamodb/`** (the **DynamoDB table** for **S3 backend state locking**, partition key `LockID`). Application-facing roots stay under **`terraform/stacks/`**.
+
+**Alternatives considered:** Keep VPC as just another “stack” (fewer top-level folders) — rejected to make the split obvious for developers: **infrastructure** changes rarely; **stacks** change with services and tuning.
+
+**Multi-account / multi-VPC:** DynamoDB is **regional**, not VPC-attached; deploy the lock module **once per AWS account and region** with a **unique `table_name` per account/region** (name collision is only within the same account and region). Multiple VPCs in the same account and region **reuse** the same lock table for Terraform. **Remote state path for VPC outputs** stays **`${prefix}/vpc/terraform.tfstate`** so downstream stacks did not need remote-state key changes when the folder moved. The **state bucket** root uses **`terraform init -backend=false`** on first run because the bucket cannot back its own state until it exists; operators then **migrate state** into the new bucket (documented in `terraform/infrastructure/README.md`).

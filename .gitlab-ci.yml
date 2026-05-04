@@ -1,4 +1,4 @@
-# Terraform: format check and validate only. Plan/apply run locally with your tfvars + backend.hcl.
+# Terraform: format check and validate for infrastructure + stacks roots.
 stages:
   - validate
 
@@ -6,13 +6,13 @@ variables:
   TF_IN_AUTOMATION: "true"
   TF_INPUT: "false"
 
-.terraform_stack_job:
+.terraform_root_job:
   image:
     name: hashicorp/terraform:1.9
     entrypoint: [""]
   parallel:
     matrix:
-      - TF_STACK: [vpc, security_groups, secrets, aurora, ecs_fargate]
+      - TF_ROOT: [terraform/infrastructure/vpc, terraform/infrastructure/dynamodb, terraform/infrastructure/s3_state, terraform/stacks/security_groups, terraform/stacks/secrets, terraform/stacks/aurora, terraform/stacks/ecs_fargate]
 
 terraform:fmt:
   image:
@@ -23,10 +23,10 @@ terraform:fmt:
     - terraform fmt -check -recursive terraform
 
 terraform:validate:
-  extends: .terraform_stack_job
+  extends: .terraform_root_job
   stage: validate
   needs: ["terraform:fmt"]
   script:
-    - cd "terraform/stacks/${TF_STACK}"
+    - cd "${TF_ROOT}"
     - terraform init -backend=false -input=false
     - terraform validate

@@ -1,0 +1,11 @@
+# Globally unique bucket name (per AWS account; worldwide S3 namespace).
+# After apply, set terraform_state_bucket in ../../env/dev.remote_state.tfvars to this value.
+#
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=dev.tfvars
+
+bucket_name = "myorg-ngx-platform-hub-dev-tfstate-UNIQUE_SUFFIX"
+
+# enable_versioning         = true
+# force_destroy               = false
+# deny_insecure_transport     = true
+# prevent_destroy             = false

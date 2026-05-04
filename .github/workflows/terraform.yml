@@ -28,16 +28,30 @@ jobs:
         run: terraform fmt -check -recursive terraform
 
   validate:
-    name: Validate (${{ matrix.stack }})
+    name: Validate (${{ matrix.label }})
     runs-on: ubuntu-latest
     needs: fmt
     strategy:
       fail-fast: false
       matrix:
-        stack: [vpc, security_groups, secrets, aurora, ecs_fargate]
+        include:
+          - label: infrastructure-vpc
+            tf_root: terraform/infrastructure/vpc
+          - label: infrastructure-dynamodb
+            tf_root: terraform/infrastructure/dynamodb
+          - label: infrastructure-s3_state
+            tf_root: terraform/infrastructure/s3_state
+          - label: stacks-security_groups
+            tf_root: terraform/stacks/security_groups
+          - label: stacks-secrets
+            tf_root: terraform/stacks/secrets
+          - label: stacks-aurora
+            tf_root: terraform/stacks/aurora
+          - label: stacks-ecs_fargate
+            tf_root: terraform/stacks/ecs_fargate
     defaults:
       run:
-        working-directory: terraform/stacks/${{ matrix.stack }}
+        working-directory: ${{ matrix.tf_root }}
     steps:
       - uses: actions/checkout@v4
 

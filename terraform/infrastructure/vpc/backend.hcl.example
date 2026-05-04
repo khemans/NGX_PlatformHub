@@ -1,0 +1,8 @@
+# Copy to backend.hcl (gitignored). Use the same bucket as other roots; key is unique per root.
+# Optional: set dynamodb_table after deploying terraform/infrastructure/dynamodb in this account/region.
+
+bucket       = "YOUR_ORG_TERRAFORM_STATE_BUCKET"
+key          = "ngx-platform-hub/dev/vpc/terraform.tfstate"
+region       = "us-east-1"
+encrypt      = true
+# dynamodb_table = "ngx-platform-hub-dev-terraform-locks"

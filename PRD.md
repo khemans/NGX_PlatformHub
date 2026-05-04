@@ -4,7 +4,7 @@
 **Source:** NGX Code Challenge (Senior Platform Engineer)  
 **Document purpose:** Single source of truth for scope, requirements, and success criteria aligned to the challenge brief.
 
-**Implementation snapshot (2026-05-03):** Terraform modules and split-state stacks (VPC, security groups, Secrets Manager, Aurora PostgreSQL Serverless v2, ECS Fargate + ALB) are in-repo with dual **fmt/validate-only** CI (GitHub Actions + GitLab). Repository **`README.md`**, **`DECISIONS.md`**, and **`diagrams/`** (Mermaid architecture) are present. Automation **application** code, Terraform tests, supplemental “digging deeper” work, and AI workflow artifacts are **not** present yet. See **§10** for a full delta.
+**Implementation snapshot (2026-05-03):** Terraform modules, **`terraform/infrastructure/`** (S3 bucket for remote state, VPC, optional DynamoDB state-lock table), and **`terraform/stacks/`** (security groups, Secrets Manager, Aurora PostgreSQL Serverless v2, ECS Fargate + ALB) are in-repo with dual **fmt/validate-only** CI (GitHub Actions + GitLab). Repository **`README.md`**, **`DECISIONS.md`**, and **`diagrams/`** (Mermaid architecture) are present. Automation **application** code, Terraform tests, supplemental “digging deeper” work, and AI workflow artifacts are **not** present yet. See **§10** for a full delta.
 
 ---
 
@@ -71,8 +71,8 @@ This initiative delivers an **Internal Developer Platform (IDP)**-style solution
 
 ### 6.2 Terraform & CI/CD
 
-- **FR-TF-1:** Use **Terraform** to define infrastructure; **all workloads** deploy via a **CI/CD pipeline** (challenge wording). *Current repo choice:* GitHub Actions / GitLab run **`terraform fmt -check`** and **`terraform validate`** only; **plan/apply** and all variable values are **operator-driven** via `terraform/env/*.tfvars`, per-stack `dev.tfvars`, and `backend.hcl` (see `terraform/stacks/README.md`). A follow-up may add a separate deploy workflow or external runner without embedding stack config in YAML.
-- **FR-TF-2:** Use **reusable modules** as appropriate. *Done:* `terraform/modules/` (vpc, security_groups, secrets, aurora, ecs_fargate) composed by thin roots under `terraform/stacks/`.
+- **FR-TF-1:** Use **Terraform** to define infrastructure; **all workloads** deploy via a **CI/CD pipeline** (challenge wording). *Current repo choice:* GitHub Actions / GitLab run **`terraform fmt -check`** and **`terraform validate`** only; **plan/apply** and all variable values are **operator-driven** via `terraform/env/*.tfvars`, per-root `dev.tfvars`, and `backend.hcl` (see **`terraform/infrastructure/README.md`** and **`terraform/stacks/README.md`**). A follow-up may add a separate deploy workflow or external runner without embedding stack config in YAML.
+- **FR-TF-2:** Use **reusable modules** as appropriate. *Done:* `terraform/modules/` (vpc, security_groups, secrets, aurora, ecs_fargate, dynamodb_state_lock, s3_tfstate_bucket) composed by roots under **`terraform/infrastructure/`** and **`terraform/stacks/`**.
 - **FR-TF-3:** Include **automated verification of configuration** in one or more modules (e.g. **Terraform tests** or equivalent checks that validate required configuration). *Not done yet:* no `terraform test` / policy checks in CI beyond validate.
 - **FR-TF-4:** CI/CD must include a path for **deploying Terraform** resources. *Partial:* validate path exists; **apply** path is intentionally out of pipeline files pending explicit design (local CLI or future job that only references tfvars files, not inline env).
 - **FR-TF-5:** Secrets via **SSM Parameter Store**, **Secrets Manager**, or similar — **no secrets in code**. *Done for infra:* app secret module + Aurora `manage_master_user_password`; tfvars examples hold placeholders only.
@@ -152,14 +152,14 @@ Use this checklist against the **original** challenge; bracketed notes reflect *
 | **G4** Persistence (S3 / Dynamo / Aurora) | **Partial** | **Aurora PostgreSQL** + managed master secret; no app writing to S3/Dynamo yet. |
 | **G5** AI workflow evidence | **Not started** | No `CLAUDE.md` / MCP config; no sample PR documented in-repo. |
 | **G6** Docs & diagrams | **Partial** | Root **`README.md`**, **`DECISIONS.md`**, **`diagrams/`** + stack/env examples; expand when automation service and supplemental work land. |
-| **FR-TF-2** Modules | **Done** | `terraform/modules/{vpc,security_groups,secrets,aurora,ecs_fargate}`. |
+| **FR-TF-2** Modules | **Done** | `terraform/modules/{vpc,security_groups,secrets,aurora,ecs_fargate,dynamodb_state_lock,s3_tfstate_bucket}`. |
 | **FR-TF-1 / FR-TF-4** Deploy via pipeline | **Gap** | Intentional: all stack inputs live in **tfvars** + `backend.hcl`; pipelines stay static. Reconcile with reviewers by adding a thin apply job that only invokes Terraform with committed or mounted var-files, or document TFC/GitOps. |
 | **FR-TF-3** Tests | **Gap** | Add `terraform/tests` or module-level `tests` + optional `check` blocks / policy in CI. |
 | **FR-TF-5 / FR-TF-6** Secrets & IAM | **Largely done** | Secrets Manager for app token + RDS-managed master; SG wiring; scoped IAM for ECS tasks (review ECR/public image pull path if switching images). |
 | **FR-SVC** Full service requirements | **Gap** | Alarms/SNS, structured app logging, Dockerfile, API semantics, “platform user” narrative still open. |
 | **§7 Supplemental** | **Not started** | Pick one option and link from future `DECISIONS.md`. |
 
-**Inventory (paths):** `terraform/modules/`, `terraform/stacks/{vpc,security_groups,secrets,aurora,ecs_fargate}/`, `terraform/env/*.tfvars.example`, `.github/workflows/terraform.yml`, `.gitlab-ci.yml`.
+**Inventory (paths):** `terraform/modules/` (including `dynamodb_state_lock`, `s3_tfstate_bucket`), `terraform/infrastructure/{s3_state,vpc,dynamodb}/`, `terraform/stacks/{security_groups,secrets,aurora,ecs_fargate}/`, `terraform/env/*.tfvars.example`, `.github/workflows/terraform.yml`, `.gitlab-ci.yml`.
 
 ---
 

@@ -1,0 +1,7 @@
+# Required: unique table name per AWS account + region.
+# table_name = "ngx-platform-hub-dev-terraform-locks"
+#
+# Plan/apply:
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=dev.tfvars
+
+table_name = "ngx-platform-hub-dev-terraform-locks"

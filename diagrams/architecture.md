@@ -1,6 +1,6 @@
 # Architecture (high level)
 
-This diagram describes the **AWS resources provisioned by Terraform** in this repository: networking, data plane, secrets, and a public load balancer to a private ECS service. It is intentionally simple; extend it when you add the real automation service, extra observability, or CI deploy paths.
+This diagram describes the **AWS resources provisioned by Terraform** in this repository: **S3** for Terraform state objects (**`terraform/infrastructure/s3_state/`**), networking (root **`terraform/infrastructure/vpc/`**), optional **DynamoDB** for Terraform state locking (**`terraform/infrastructure/dynamodb/`**), data plane, secrets, and a public load balancer to a private ECS service. Extend it when you add the real automation service and deeper observability.
 
 ```mermaid
 flowchart TB
@@ -9,6 +9,8 @@ flowchart TB
   end
 
   subgraph AWS["AWS account"]
+    S3[(S3\nTerraform state bucket)]
+    DDB[(DynamoDB\nTerraform state lock)]
     subgraph VPC["VPC"]
       IGW[Internet Gateway]
       NAT[NAT Gateway]
@@ -52,6 +54,8 @@ flowchart TB
 - **Private subnets:** ECS tasks and Aurora; outbound via NAT for image pulls and AWS APIs.
 - **Security groups:** ALB ↔ ECS (HTTP), ECS → Aurora (PostgreSQL), etc. (see `terraform/modules/security_groups`).
 - **Secrets Manager:** Application secret JSON (token) plus RDS-managed master user secret for Aurora.
+- **S3:** Bucket for Terraform **`.tfstate`** objects (see `terraform/infrastructure/s3_state/`); configured in each root’s `backend.hcl` as **`bucket`** / **`key`**.  
+- **DynamoDB:** Optional regional table (`LockID` key) used by the Terraform **S3 backend** for state locking; not on the application data path (see `terraform/infrastructure/dynamodb/`).
 
 ## Source of truth
 

@@ -14,8 +14,9 @@ Full challenge scope, acceptance criteria, and a **delta against what is impleme
 
 | Path | Purpose |
 |------|---------|
-| **`terraform/modules/`** | Reusable modules: `vpc`, `security_groups`, `secrets`, `aurora`, `ecs_fargate`. |
-| **`terraform/stacks/`** | One Terraform root per slice; each has its own S3 state key. See [**`terraform/stacks/README.md`**](terraform/stacks/README.md). |
+| **`terraform/modules/`** | Reusable modules: `vpc`, `security_groups`, `secrets`, `aurora`, `ecs_fargate`, `dynamodb_state_lock`, `s3_tfstate_bucket`. |
+| **`terraform/infrastructure/`** | Slow-changing roots: **S3 state bucket**, **VPC**, **DynamoDB Terraform lock table** (per account/region). See [**`terraform/infrastructure/README.md`**](terraform/infrastructure/README.md). |
+| **`terraform/stacks/`** | Application-facing roots (security groups, secrets, Aurora, ECS); each has its own S3 state key. See [**`terraform/stacks/README.md`**](terraform/stacks/README.md). |
 | **`terraform/env/`** | Shared `*.core.tfvars` / `*.remote_state.tfvars` examples (copy to real `.tfvars`, gitignored). |
 | **`diagrams/`** | Architecture diagram source ([**`diagrams/architecture.md`**](diagrams/architecture.md)). |
 | **`DECISIONS.md`** | Short design rationale for major choices. |
@@ -24,11 +25,11 @@ Full challenge scope, acceptance criteria, and a **delta against what is impleme
 
 ## Quick start
 
-1. Copy **`terraform/env/*.tfvars.example`** to real tfvars (see [`terraform/stacks/README.md`](terraform/stacks/README.md) for which stacks need which files).
-2. In each stack directory, copy **`backend.hcl.example`** → **`backend.hcl`** and set bucket, key, and region.
-3. Apply stacks **in order**: `vpc` → `security_groups` & `secrets` → `aurora` → `ecs_fargate`.
+1. Copy **`terraform/env/*.tfvars.example`** to real tfvars (see [`terraform/infrastructure/README.md`](terraform/infrastructure/README.md) and [`terraform/stacks/README.md`](terraform/stacks/README.md)).
+2. In each Terraform root, copy **`backend.hcl.example`** → **`backend.hcl`** and set bucket, key, region, and (optionally) **`dynamodb_table`** after deploying the lock table.
+3. Apply **in order**: **`terraform/infrastructure/s3_state/`** (bootstrap with **`init -backend=false`** first; see infrastructure README) → **`terraform/infrastructure/dynamodb/`** (optional) → **`terraform/infrastructure/vpc/`** → **`terraform/stacks/*`** as documented in the READMEs above.
 
-Detailed commands, destroy order, and CI behavior are documented in **`terraform/stacks/README.md`**.
+Detailed commands, destroy order, and CI behavior are split between **`terraform/infrastructure/README.md`** and **`terraform/stacks/README.md`**.
 
 ## Status (summary)
 
