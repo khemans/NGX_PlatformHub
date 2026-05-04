@@ -1,0 +1,8 @@
+# Required: task count and image (container_port defaults to 80 on variable).
+# Also pass ../../env/dev.core.tfvars and ../../env/dev.remote_state.tfvars.
+#
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=../../env/dev.remote_state.tfvars -var-file=dev.tfvars
+
+ecs_desired_count = 1
+container_image   = "nginx:1.27-alpine"
+# container_port    = 80

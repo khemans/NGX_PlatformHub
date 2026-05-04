@@ -1,0 +1,3 @@
+terraform_state_bucket  = "YOUR_ORG_TERRAFORM_STATE_BUCKET"
+terraform_state_region  = "us-east-1"
+terraform_state_prefix  = "ngx-platform-hub/prod"

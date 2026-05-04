@@ -1,0 +1,9 @@
+# Optional: override network tuning (defaults on variables: container_port, alb_ingress_cidrs).
+# Required env tfvars:
+#   - ../../env/dev.core.tfvars
+#   - ../../env/dev.remote_state.tfvars
+#
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=../../env/dev.remote_state.tfvars -var-file=dev.tfvars
+
+# container_port     = 80
+# alb_ingress_cidrs  = ["203.0.113.10/32"]

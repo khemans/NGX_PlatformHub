@@ -1,0 +1,9 @@
+# S3 remote state location (stacks that read other stacks' outputs). Copy to dev.remote_state.tfvars.
+# Use together with dev.core.tfvars, e.g.:
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=../../env/dev.remote_state.tfvars -var-file=dev.tfvars
+#
+# Do NOT pass this file to the vpc or secrets roots (they do not declare these variables).
+
+terraform_state_bucket  = "YOUR_ORG_TERRAFORM_STATE_BUCKET"
+terraform_state_region  = "us-east-1"
+terraform_state_prefix  = "ngx-platform-hub/dev"

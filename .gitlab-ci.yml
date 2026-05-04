@@ -1,0 +1,32 @@
+# Terraform: format check and validate only. Plan/apply run locally with your tfvars + backend.hcl.
+stages:
+  - validate
+
+variables:
+  TF_IN_AUTOMATION: "true"
+  TF_INPUT: "false"
+
+.terraform_stack_job:
+  image:
+    name: hashicorp/terraform:1.9
+    entrypoint: [""]
+  parallel:
+    matrix:
+      - TF_STACK: [vpc, security_groups, secrets, aurora, ecs_fargate]
+
+terraform:fmt:
+  image:
+    name: hashicorp/terraform:1.9
+    entrypoint: [""]
+  stage: validate
+  script:
+    - terraform fmt -check -recursive terraform
+
+terraform:validate:
+  extends: .terraform_stack_job
+  stage: validate
+  needs: ["terraform:fmt"]
+  script:
+    - cd "terraform/stacks/${TF_STACK}"
+    - terraform init -backend=false -input=false
+    - terraform validate

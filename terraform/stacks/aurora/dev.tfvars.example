@@ -1,0 +1,7 @@
+# Required stack tfvars (no defaults on module version / snapshot policy).
+# Also pass ../../env/dev.core.tfvars and ../../env/dev.remote_state.tfvars.
+#
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=../../env/dev.remote_state.tfvars -var-file=dev.tfvars
+
+aurora_engine_version      = "15.10"
+aurora_skip_final_snapshot = true

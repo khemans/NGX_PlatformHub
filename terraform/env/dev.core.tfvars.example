@@ -1,0 +1,7 @@
+# Identity for all stacks in the dev environment. Copy to dev.core.tfvars (gitignored).
+# Usage (example for vpc):
+#   terraform plan -var-file=../../env/dev.core.tfvars -var-file=dev.tfvars
+
+aws_region   = "us-east-1"
+project_name = "ngx-platform-hub"
+environment  = "dev"
